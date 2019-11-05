@@ -20,14 +20,23 @@ public class RecyclerUserAdapter extends RecyclerView.Adapter<RecyclerUserAdapte
 
     private Context context;
     private List<UserModel> userModelList;
-
+    private OnItemClickListener listener;
+    /*
+        La clase qye quiera escuchar el evneto onClickListener del recyclerView debe implementar la siguiente interfaz.
+        Opción 1 : Heredar de View.onClickListener
+     */
+    public interface OnItemClickListener extends View.OnClickListener {
+        @Override
+        void onClick(View v);
+    }
     /**
      * Constructor
      * @param context Contexto de nuestro usuario
      */
-    public RecyclerUserAdapter(Context context){
+    public RecyclerUserAdapter(Context context, OnItemClickListener listener){
         this.context = context;
-        this.userModelList = (ArrayList<UserModel>) RepositoryUser.getInstance().getUsers();
+        this.userModelList = RepositoryUser.getInstance().getUsers();
+        this.listener = listener;
     }
 
     /**
@@ -41,6 +50,8 @@ public class RecyclerUserAdapter extends RecyclerView.Adapter<RecyclerUserAdapte
     public RecyclerUserAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View nuevaVista = LayoutInflater.from(context).inflate(R.layout.recycler_view_item, parent, false);
+        // Opción 1 : Se ha aprovechado que el listener OnClick existe en todos los Objetos view
+        nuevaVista.setOnClickListener(listener);
 
         return new ViewHolder(nuevaVista);
     }
