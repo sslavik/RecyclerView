@@ -21,13 +21,21 @@ public class RecyclerUserAdapter extends RecyclerView.Adapter<RecyclerUserAdapte
     private Context context;
     private List<UserModel> userModelList;
     private OnItemClickListener listener;
+    private OnUserClickListener userListener;
     /*
-        La clase qye quiera escuchar el evneto onClickListener del recyclerView debe implementar la siguiente interfaz.
+        La clase que quiera escuchar el evento onClickListener del recyclerView debe implementar la siguiente interfaz.
         Opción 1 : Heredar de View.onClickListener
      */
     public interface OnItemClickListener extends View.OnClickListener {
         @Override
         void onClick(View v);
+    }
+    /*
+        Implementamos un interfaz para tener un Listener que obtenga directamente el usuario para usarlo en el Activity o en el Fragment
+        Opcion 2 : Crear un View.OnUserClickListener(UserModel user)
+     */
+    public interface OnUserClickListener {
+        void onClick(UserModel user);
     }
     /**
      * Constructor
@@ -38,6 +46,18 @@ public class RecyclerUserAdapter extends RecyclerView.Adapter<RecyclerUserAdapte
         this.userModelList = RepositoryUser.getInstance().getUsers();
         this.listener = listener;
     }
+
+    /**
+     * Sobreescrito el Constructor para tener un nuevo Listener
+     * @param context
+     * @param userListener
+     */
+    public RecyclerUserAdapter(Context context, OnUserClickListener userListener){
+        this.context = context;
+        this.userModelList = RepositoryUser.getInstance().getUsers();
+        this.userListener = userListener;
+    }
+
 
     /**
      *Método que actualiza / infla desde XML el ViewHolder que hemos creado
@@ -62,12 +82,19 @@ public class RecyclerUserAdapter extends RecyclerView.Adapter<RecyclerUserAdapte
      * @param position
      */
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         String name = userModelList.get(position).getName();
         String email = userModelList.get(position).getEmail();
 
         ((TextView)holder.tvUser).setText(name);
         ((TextView)holder.tvEmail).setText(email);
+        // NECESITAMOS ASIGNARLE EL ONLCIKC AL View del HOLDER
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                userListener.onClick(userModelList.get(position));
+            }
+        });
     }
 
     @Override
@@ -77,6 +104,11 @@ public class RecyclerUserAdapter extends RecyclerView.Adapter<RecyclerUserAdapte
     /**
      * Almacena las vistas o los elementos / itemView que componen el RecyclerView
      */
+
+    public UserModel getItem(int position){
+        return userModelList.get(position);
+    }
+
     public class ViewHolder extends  RecyclerView.ViewHolder {
 
         private View tvUser;

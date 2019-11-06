@@ -9,10 +9,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements RecyclerUserAdapter.OnItemClickListener{
+import com.sslavik.recyclerview.Model.UserModel;
+
+public class MainActivity extends AppCompatActivity { //implements RecyclerUserAdapter.OnItemClickListener{
 
     private RecyclerView rvUser;
     private RecyclerUserAdapter userAdapter;
+    // CREAMOS UN DELEGADO / LISTENER PARA LAS VISTAS (HOLDERS) DEL RECYCLERS
+    private RecyclerUserAdapter.OnUserClickListener userClickListener = new RecyclerUserAdapter.OnUserClickListener() {
+        @Override
+        public void onClick(UserModel user) {
+            Toast.makeText(MainActivity.this, user.getName(), Toast.LENGTH_SHORT).show();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,13 +29,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerUserAdapt
         setContentView(R.layout.activity_main);
         rvUser = findViewById(R.id.rvUsers);
         rvUser.setLayoutManager(new LinearLayoutManager(this,RecyclerView.VERTICAL, false));
-        userAdapter = new RecyclerUserAdapter(this, this);
+        // userAdapter = new RecyclerUserAdapter(this, this); // CON ESTE CONSTRUCTOR BASAMOS EL LISTENER DIRECTAMENTE CON EL IMPLEMENT DEL LISTENER OnItemClickListener
+        userAdapter = new RecyclerUserAdapter(this, userClickListener);
         rvUser.setAdapter(userAdapter);
 
+
     }
+    /*
     // Este es el método que se ejecuta automáticamente cuando se hace click en un elemento del RecyclerView
     @Override
     public void onClick(View v) {
-        Toast.makeText(this,"Se ha pulsado" + v.getId(),Toast.LENGTH_SHORT);
+        Toast.makeText(this,"Se ha pulsado " + userAdapter.getItem(rvUser.getChildAdapterPosition(v)).getName(),Toast.LENGTH_SHORT).show();
     }
+
+     */
 }
